@@ -7,16 +7,16 @@ driver.get('http://ultimatescholarshipbook.com')
 searchBox = driver.find_element_by_name('criteria')
 edition = driver.find_element_by_tag_name('select')
 
-def ObtainData:
-     code = str(codeList.readline())
-  
-    searchBox.sendKeys(code)
+def EnterCode:
+    code = str(codeList.readline())
+    print('inputing code: '+code)
+    
+    searchBox.send_Keys(code)
     editions = edition.find_elements_by_tag_name('option')
     for e in editions:
         if (str(e.get_attribute('value')) == "2019"):
             e.click()
-    searchSubmit = driver.find_element_by_class_name('search_submit')
-    searchSubmit.click()
+    searchSubmit = driver.find_element_by_class_name('search_submit').click()
        
     titles = driver.find_elements_by_class_name('AwardTitle')
     awardTitle = str(title[0])
@@ -24,11 +24,43 @@ def ObtainData:
     info = driver.find_elements_by_class_name('AwardBody')
     
 def SetData:
-    awardGiver = str(info[0])
-    awardTarget = str(info[1])
-    awardPurpose = str(info[2]) #TODO substring
-    awardEligible = str(info[3])
-    awardLink = info[info.len()-2]
+    
+    awardGiver = info[0].text #Done
+    
+    
+    targetYoung = False
+    targetHighSchool = False
+    targetCollege = False
+    targetGraduate = False
+    targetAdult = False
+    
+    awardTarget = info[1].text
+    
+    if(awardTarget.contains('young')):
+        targetYoung = True
+    elif(awardTarget.contains('high')):
+        targetHighSchool = True
+    elif(awardTarget.contains('college')):
+        targetCollege = True
+    elif(awardTarget.contains('graduate')):
+        targetGraduate = True
+    elif(awardTarget.contains('adult')):
+        targetAdult = True
+    
+    awardPurpose = info[2].text #TODO substring
+    
+    
+    
+    
+    awardEligible = info[3].text
+    
+    
+    
+    
+    awardLink = info[len(info)-2].text
+    
+    
+    
     
     targetHighSchool = False
     targetCollege = False
@@ -59,16 +91,9 @@ def SetData:
     elif(awardEligible.contains('personal statement')):
         awardStatement = True
         
-    if(awardTarget.contains('high')):
-        targetHighSchool = True
-    elif(awardTarget.contains('college')):
-        targetCollege = True
-    elif(awardTarget.contains('graduate')):
-        targetGraduate = True
-    elif(awardTarget.contains('adult')):
-        targetAdult = True
+    
         
 for k in range(0, 9999) #TODO Fix 9999 value
-   ObtainData()
+   EnterCode()
    SetData()
     
