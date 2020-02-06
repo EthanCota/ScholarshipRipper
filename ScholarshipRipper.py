@@ -1,5 +1,6 @@
 from Selenium import Webdriver  #figure out how to create my own module
 import datetime as dt
+import ethanmod as em
 
 codeList = open('codes.txt','r', encoding='UTF8')
 
@@ -9,25 +10,9 @@ search = d.find_element_by_name('criteria')
 editions = d.find_element_by_tag_name('select').find_elements_by_tag_name('option')
 submit = d.find_element_by_class_name('search_submit')
 
-def hasNumbers(inputString):    #Code from thefourtheye on StackOverflow
-    return any(char.isdigit() for char in inputString)
-
-def find_str(s, char):      #Code from Erik Fortin on StackOverflow
-    index = 0
-
-    if char in s:
-        c = char[0]
-        for ch in s:
-            if ch == c:
-                if s[index:index+len(char)] == char:
-                    return index
-
-            index += 1
-
-    return -1
-
 def ObtainData():
-     code = str(codeList.readline())
+     code = codeList.readline()
+     code = code[:len(code)-1]
   
     search.sendKeys(code)
     
