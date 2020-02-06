@@ -1,43 +1,61 @@
-from Selenium import Webdriver
+from Selenium import Webdriver  #figure out how to create my own module
+import datetime as dt
 
 codeList = open('codes.txt','r', encoding='UTF8')
 
-driver = webdriver.Chrome('C:\\chromedriver') #TODO correct path
-driver.get('http://ultimatescholarshipbook.com')
-searchBox = driver.find_element_by_name('criteria')
-edition = driver.find_element_by_tag_name('select')
+d = webdriver.Chrome('C:\\chromedriver')
+d.get('http://ultimatescholarshipbook.com')
+search = d.find_element_by_name('criteria')
+editions = d.find_element_by_tag_name('select').find_elements_by_tag_name('option')
+submit = d.find_element_by_class_name('search_submit')
 
-def EnterCode:
-    code = str(codeList.readline())
-    print('inputing code: '+code)
+def hasNumbers(inputString):    #Code from thefourtheye on StackOverflow
+    return any(char.isdigit() for char in inputString)
+
+def find_str(s, char):      #Code from Erik Fortin on StackOverflow
+    index = 0
+
+    if char in s:
+        c = char[0]
+        for ch in s:
+            if ch == c:
+                if s[index:index+len(char)] == char:
+                    return index
+
+            index += 1
+
+    return -1
+
+def ObtainData():
+     code = str(codeList.readline())
+  
+    search.sendKeys(code)
     
-    searchBox.send_Keys(code)
-    editions = edition.find_elements_by_tag_name('option')
     for e in editions:
         if (str(e.get_attribute('value')) == "2019"):
             e.click()
-    searchSubmit = driver.find_element_by_class_name('search_submit').click()
+    
+    submit.click()
        
-    titles = driver.find_elements_by_class_name('AwardTitle')
+    titles = d.find_elements_by_class_name('AwardTitle')
     awardTitle = str(title[0])
     
-    info = driver.find_elements_by_class_name('AwardBody')
+    info = d.find_elements_by_class_name('AwardBody')
     
-def SetData:
+def SetData():
+    awardGiver = info[0].text
     
-    awardGiver = info[0].text #Done
     
+    awardTarget = info[1].text
     
-    targetYoung = False
+    targetJuniorHigh = False
     targetHighSchool = False
     targetCollege = False
     targetGraduate = False
     targetAdult = False
     
-    awardTarget = info[1].text
-    
-    if(awardTarget.contains('young')):
-        targetYoung = True
+    if(awardTarget.contains('younger')):
+        targetJuniorHigh = True
     elif(awardTarget.contains('high')):
         targetHighSchool = True
     elif(awardTarget.contains('college')):
@@ -47,53 +65,71 @@ def SetData:
     elif(awardTarget.contains('adult')):
         targetAdult = True
     
-    awardPurpose = info[2].text #TODO substring
+    
+    awardPurpose = info[2].text[9:]
     
     
+    awardEligible = info[3] #TODO Add SAT and ACT info || substring
     
-    
-    awardEligible = info[3].text
-    
-    
-    
-    
-    awardLink = info[len(info)-2].text
-    
-    
-    
-    
-    targetHighSchool = False
-    targetCollege = False
-    targetGraduate = False
-    targetAdult = False
-    
-    awardNeedBased = False #TODO Add SAT and ACT info
-    awardEssay = False
-    awardTranscript = False
-    awardStatement = False
-    
-    for i in info:
-        if(i.startswith('Minimum')):
-            awardGPA = str(i) #TODO substring
-        elif(i.startswith('Amount')):
-            awardAmount = str(i) #TODO substring
-        elif(i.startswith('Number')):
-            awardQuantity = str(i) #TODO substring
-        elif(i.startswith('Deadline')):
-            awardDeadline = str(i) #TODO substring
+    isNeedBased = False 
+    isEssay = False
+    isTranscript = False
+    isStatement = False
     
     if(awardEligible.contains('financial need') or awardEligible.contains('need based') or awardEligible.contains('financial aid')):
-        awardNeedBased = True
+        isNeedBased = True
     elif(awardEligible.contains('essay')):
-        awardEssay = True
+        isEssay = True
     elif(awardEligible.contains('transcript')):
-         awardTranscript = True
+         isTranscript = True
     elif(awardEligible.contains('personal statement')):
-        awardStatement = True
-        
+        isStatement = True
     
+    if(awardEligible.contains('must') and awardEligible.contains('. ')):
+        req1 = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
+        awardEligible = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
+        if(awardEligible.contains('must') and awardEligible.contains('. ')):
+            requirement2 = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
+            awardEligible = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
+            if(awardEligible.contains('must') and awardEligible.contains('. ')):
+                requirement3 = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
+                awardEligible = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
+            else: req3 = ''
+        else: req2 = ''
+            req3 = ''
+    else: req1 = ''
+        req2 = ''
+        req3 = ''
         
-for k in range(0, 9999) #TODO Fix 9999 value
-   EnterCode()
+    j = 0
+    if(info[4].text.startswith('Min'):
+        awardGPA = info[4].text #TODO substring
+        j+=1
+    
+       
+    awardAmount = info[k+4].text
+    
+    if not (awardAmount.contains('Var')):
+       awardAmount = awardAmount[find_str(awardAmount, '$')+1:find_str(awardAmount, '.')]
+    else: awardAmount = 'varies'
+       
+       
+    awardQuantity = info[k+5].text
+    if(hasNumbers(awardQuantity)):
+       awardQuantity = awardQuantity[len(awardQuantity)-2:len(awardQuantity)]
+    else: awardQuantity = 'varies'
+       
+       
+    awardDeadline = info[k+6].text #TODO figure out how to use the DateTime module
+    if(hasNumbers(awardDeadline)):
+        
+    else: awardDeadline = 'varies'
+       
+       
+    awardLink = info[len(info)-2].text
+  
+
+for l in range(0, 2654)
+   ObtainData()
    SetData()
     
