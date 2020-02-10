@@ -1,3 +1,4 @@
+#TODO Create a class system so it can be ported as a module to other scripts
 
 #Author:thefourtheye on StackOverflow
 #Returns True if the input string contains a number in it
