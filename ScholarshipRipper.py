@@ -1,37 +1,17 @@
-#TODO import a module to put information into google sheets/excel
-from Selenium import Webdriver
+#TODO import gspead?
+from Selenium import Webdriver as wd
 import datetime as dt
-import ethanmod as em
+import cotaLib as cl
 
-#Returns True if the input string contains a number in it
-def containsnumber(string):
-    return any(char.isdigit() for char in string)
+def PrepScholar(): #Opens ultimatescholarshipbook.com and preps site for code entry
+    codeList = open('codes.txt','r', encoding='UTF8')
+    d = wd.Chrome('C:\\chromedriver')
+    d.get('http://ultimatescholarshipbook.com')
+    search = d.find_element_by_name('criteria')
+    editions = d.find_element_by_tag_name('select').find_elements_by_tag_name('option')
+    submit = d.find_element_by_class_name('search_submit')
 
-#Returns the index of the first instance of substring within string
-def findsubstring(string, substr):
-    index = 0
-
-    if substr in string:
-        char = substr[0]
-        for ch in string:
-            if ch == char:
-                if string[index:index+len(substr)] == substr:
-                    return index
-
-            index += 1
-
-    return -1
-#Opens document containing scholarship codes
-codeList = open('codes.txt','r', encoding='UTF8')
-#Opens ultimatescholarshipbook.com and preps site for code entry
-d = webdriver.Chrome('C:\\chromedriver')
-d.get('http://ultimatescholarshipbook.com')
-search = d.find_element_by_name('criteria')
-editions = d.find_element_by_tag_name('select').find_elements_by_tag_name('option')
-submit = d.find_element_by_class_name('search_submit')
-
-def ObtainData():
-     #takes the '\n' out of the code then enters it into the site
+def ObtainScholar(): #Enters a code into the site
      code = codeList.readline()
      code = code[:len(code)-1]
     search.sendKeys(code)
@@ -40,26 +20,20 @@ def ObtainData():
             e.click()
     submit.click()
     
-    
-    
-def SetData():
-    #Finds the scholarship title
+def SetData(): #Scrapes site to collect scholarship info
     titles = d.find_elements_by_class_name('AwardTitle')
-    awardTitle = str(title[0])
+    info = d.find_elements_by_class_name('AwardBody') 
     
-    info = d.find_elements_by_class_name('AwardBody')
-    #Finds the scholarship awarder
-    awardGiver = info[0].text
+    awardTitle = title[0].txt #Scholarship Title
     
-    #Finds who the scholarship is for
-    awardTarget = info[1].text
-    #Resets all target values to False
+    awardGiver = info[0].text #Scholarship Giver
+    
+    awardTarget = info[1].text #Scholarship Target
     targetJuniorHigh = False
     targetHighSchool = False
     targetCollege = False
     targetGraduate = False
     targetAdult = False
-    #Sets target true if it contains said keyword
     if(awardTarget.contains('younger')):
         targetJuniorHigh = True
     elif(awardTarget.contains('high')):
@@ -71,17 +45,13 @@ def SetData():
     elif(awardTarget.contains('adult')):
         targetAdult = True
     
-    #Finds the listed purpose of the award
-    awardPurpose = info[2].text[9:]
+    awardPurpose = info[2].text[9:] #Scholarship Purpose
     
-    #Finds the paragraph describing eligibility
-    awardEligible = info[3] #TODO Add SAT and ACT info || substring
-    #Resets eligiility variables to False
+    awardEligible = info[3] #TODO Add SAT and ACT info || substring #Scholarship Eligibility (Need-based, essay, etc.)
     isNeedBased = False 
     isEssay = False
     isTranscript = False
     isStatement = False
-    #Sets eligibility variable to true if it contains said keyword
     if(awardEligible.contains('financial need') or awardEligible.contains('need based') or awardEligible.contains('financial aid')):
         isNeedBased = True
     elif(awardEligible.contains('essay')):
@@ -90,7 +60,6 @@ def SetData():
          isTranscript = True
     elif(awardEligible.contains('personal statement')):
         isStatement = True
-    #Finds up to 3 eligibility statements within the paragraph
     if(awardEligible.contains('must') and awardEligible.contains('. ')):
         req1 = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
         awardEligible = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
@@ -107,36 +76,28 @@ def SetData():
         req2 = ''
         req3 = ''
     
-    #Detects if there is a required GPA and sets up proceeding variables accordingly
     j = 0
     if(info[4].text.startswith('Min'):
-        awardGPA = info[4].text #TODO substring
+        awardGPA = info[4].text #TODO substring #Scholarship GPA Requirement
         j+=1
     
-    #Finds scholarship reward
-    awardAmount = info[j+4].text
+    awardAmount = info[j+4].text #Scholarship Reward
     if not (awardAmount.contains('Var')):
        awardAmount = awardAmount[find_str(awardAmount, '$')+1:find_str(awardAmount, '.')]
     else: awardAmount = 'varies'
        
-    #Finds the quanitity of scholarships given
-    awardQuantity = info[j+5].text
+    awardQuantity = info[j+5].text #Scholarship Quantity
     if(hasNumbers(awardQuantity)):
        awardQuantity = awardQuantity[len(awardQuantity)-2:len(awardQuantity)]
     else: awardQuantity = 'varies'
        
-    #Finds the scholarship deadline
-    awardDeadline = info[j+6].text 
+    awardDeadline = info[j+6].text #Scholarship Deadline
     if(hasNumbers(awardDeadline)):
-        #Convert deadline to MM/DD/YY
+        #TODO: Convert deadline to MM/DD/YY
     else: awardDeadline = 'varies'
        
-    #Finds the hyperlink for the award
-    awardLink = info[len(info)-2].text
-  
-
-
-    
+    awardLink = info[len(info)-2].text #Scholarship Link
+ 
 def main():
     for l in range(0, 2654) #TODO add main function 
         ObtainData()
