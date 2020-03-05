@@ -1,11 +1,8 @@
-#TODO Create a class system so it can be ported as a module to other scripts
 
-#Author:thefourtheye on StackOverflow
 #Returns True if the input string contains a number in it
 def containsnumber(string):
     return any(char.isdigit() for char in string)
 
-#Author:Erik Fortin on StackOverflow
 #Returns the index of the first instance of substring within string
 def findsubstring(string, substr):#Code from Erik Fortin on StackOverflow
     index = 0
