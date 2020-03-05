@@ -135,7 +135,12 @@ def SetData():
     awardLink = info[len(info)-2].text
   
 
-for l in range(0, 2654) #TODO add main function 
-   ObtainData()
-   SetData()
+
     
+def main():
+    for l in range(0, 2654) #TODO add main function 
+        ObtainData()
+        SetData()
+
+if __name__ == '__main__':
+       main()
