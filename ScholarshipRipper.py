@@ -1,6 +1,6 @@
 #TODO import gspead?
 from Selenium import Webdriver as wd
-import datetime as dt
+from datetime import date as dt
 import cotaLib as cl
 
 def PrepScholar(): #Opens ultimatescholarshipbook.com and preps site for code entry
@@ -47,7 +47,11 @@ def SetData(): #Scrapes site to collect scholarship info
     
     awardPurpose = info[2].text[9:] #Scholarship Purpose
     
-    awardEligible = info[3] #TODO Add SAT and ACT info || substring #Scholarship Eligibility (Need-based, essay, etc.)
+    awardEligible = info[3].text[13:] #Scholarship Eligibility (Need-based, essay, etc.)
+    if('ACT' in awardEligible):
+        awardACT = cl.getTwoDigit(awardEligible)
+    if('SAT' in awardEligible):
+        awardSAT = cl.getFourDigit(awardEligible)
     isNeedBased = False 
     isEssay = False
     isTranscript = False
@@ -78,7 +82,7 @@ def SetData(): #Scrapes site to collect scholarship info
     
     j = 0
     if(info[4].text.startswith('Min'):
-        awardGPA = info[4].text #TODO substring #Scholarship GPA Requirement
+        awardGPA = info[4].text[5:]
         j+=1
     
     awardAmount = info[j+4].text #Scholarship Reward
@@ -93,13 +97,13 @@ def SetData(): #Scrapes site to collect scholarship info
        
     awardDeadline = info[j+6].text #Scholarship Deadline
     if(hasNumbers(awardDeadline)):
-        #TODO: Convert deadline to MM/DD/YY
+        awardDeadline = str(cl.convertDate(awardDeadline))
     else: awardDeadline = 'varies'
        
     awardLink = info[len(info)-2].text #Scholarship Link
  
 def main():
-    for l in range(0, 2654) #TODO add main function 
+    for l in range(0, 2654)
         ObtainData()
         SetData()
 
