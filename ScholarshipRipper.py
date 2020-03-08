@@ -3,7 +3,7 @@ from Selenium import Webdriver as wd
 from datetime import date as dt
 import cotaLib as cl
 
-def PrepScholar(): #Opens ultimatescholarshipbook.com and preps site for code entry
+def PrepData(): #Opens ultimatescholarshipbook.com and preps site for code entry
     codeList = open('codes.txt','r', encoding='UTF8')
     d = wd.Chrome('C:\\chromedriver')
     d.get('http://ultimatescholarshipbook.com')
@@ -11,7 +11,7 @@ def PrepScholar(): #Opens ultimatescholarshipbook.com and preps site for code en
     editions = d.find_element_by_tag_name('select').find_elements_by_tag_name('option')
     submit = d.find_element_by_class_name('search_submit')
 
-def ObtainScholar(): #Enters a code into the site
+def ObtainData(): #Enters a code into the site
      code = codeList.readline()
      code = code[:len(code)-1]
     search.sendKeys(code)
@@ -47,11 +47,11 @@ def SetData(): #Scrapes site to collect scholarship info
     
     awardPurpose = info[2].text[9:] #Scholarship Purpose
     
-    awardEligible = info[3].text[13:] #Scholarship Eligibility (Need-based, essay, etc.)
+    awardEligible = info[3].text[13:]
     if('ACT' in awardEligible):
-        awardACT = cl.getTwoDigit(awardEligible)
+        awardACT = cl.getTwoDigit(awardEligible) #Minimum ACT Score
     if('SAT' in awardEligible):
-        awardSAT = cl.getFourDigit(awardEligible)
+        awardSAT = cl.getFourDigit(awardEligible) #Minimum SAT Score
     isNeedBased = False 
     isEssay = False
     isTranscript = False
@@ -65,7 +65,7 @@ def SetData(): #Scrapes site to collect scholarship info
     elif(awardEligible.contains('personal statement')):
         isStatement = True
     if(awardEligible.contains('must') and awardEligible.contains('. ')):
-        req1 = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
+       req1 = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
         awardEligible = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
         if(awardEligible.contains('must') and awardEligible.contains('. ')):
             requirement2 = awardEligible[find_str(awardEligible, 'must')+4:find_str(awardEligible, '. ')]
@@ -82,7 +82,7 @@ def SetData(): #Scrapes site to collect scholarship info
     
     j = 0
     if(info[4].text.startswith('Min'):
-        awardGPA = info[4].text[5:]
+        awardGPA = info[4].text[5:] #Minimum GPA
         j+=1
     
     awardAmount = info[j+4].text #Scholarship Reward
@@ -103,7 +103,8 @@ def SetData(): #Scrapes site to collect scholarship info
     awardLink = info[len(info)-2].text #Scholarship Link
  
 def main():
-    for l in range(0, 2654)
+   PrepData() 
+   for l in range(0, 2654)
         ObtainData()
         SetData()
 
